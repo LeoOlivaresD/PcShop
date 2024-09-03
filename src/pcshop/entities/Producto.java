@@ -3,11 +3,11 @@ package pcshop.entities;
 
 
 public class Producto {
-    Integer idProducto;
-    String nombreProducto;
-    String descripcionProducto;
-    Double precioProducto;
-    Integer cantidadStockProducto;
+   private Integer idProducto;
+   private String nombreProducto;
+   private String descripcionProducto;
+   private Double precioProducto;
+   private Integer cantidadStockProducto;
 
     //Contructores
     public Producto() {
