@@ -1,6 +1,7 @@
 package pcshop.entities;
 
 import java.util.ArrayList;
+import java.util.InputMismatchException;
 import java.util.List;
 import java.util.Random;
 import java.util.Scanner;
@@ -47,79 +48,147 @@ public class Inventario {
         return null;
     }
 
-    public Producto obtenerProductoPorNombre(String nombreProd) {
-        Producto productoBuscado = new Producto();
+    public void obtenerProductoPorNombre(String nombreProd) {
+        Producto productoBuscado = null;
         for (Producto productoEncontrado : listaProductos) {
-            if (productoEncontrado.getNombreProducto().equalsIgnoreCase(nombreProd)) {
+            if (productoEncontrado.getNombreProducto().contains(nombreProd)) {
                 System.out.println("Producto encontrado !");
                 productoBuscado = productoEncontrado;
-                return productoBuscado;
+                System.out.println(productoBuscado);
             } else {
-                System.out.println("Lo sentimos, no encontramos el producto");
+                productoBuscado = null;
             }
         }
-        return null;
+        if (productoBuscado == null) {
+            System.out.println("Lo sentimos, el producto no existe");
+        }
     }
 
     public void agregarProducto(Producto producto) {
-
         Scanner sc = new Scanner(System.in);
         producto.setIdProducto(generarIdProducto());
         System.out.println("Id generado: " + producto.getIdProducto());
+
         System.out.println("Ingrese nombre para producto: ");
         String nombreProducto = sc.nextLine();
         producto.setNombreProducto(nombreProducto);
-        System.out.println("Nombre agregado con exito !");
-        System.out.println("Ingrese una descripcion para el producto: ");
+        System.out.println("Nombre agregado con éxito!");
+
+        System.out.println("Ingrese una descripción para el producto: ");
         String descripcionProd = sc.nextLine();
         producto.setDescripcionProducto(descripcionProd);
-        System.out.println("Descripcion agregada con exito !");
-        System.out.println("Ingrese precio del producto: ");
-        double precio = sc.nextDouble();
-        producto.setPrecioProducto(precio);
-        System.out.println("Precio agregado con exito !");
-        System.out.println("Ingrese cantidad de stock para productos");
-        int stock = sc.nextInt();
-        producto.setCantidadStockProducto(stock);
-        System.out.println("Stock agregado con exito !");
-        listaProductos.add(producto);
+        System.out.println("Descripción agregada con éxito!");
 
-        if (!listaProductos.isEmpty()) {
-            System.out.println("Producto agregado con exito al inventario");
-        }
-
-    }
-
-    public void actualizarProducto(int idProd) {
-        Scanner sc = new Scanner(System.in);
-        Producto productoBuscado;
-        for (Producto productoEncontrado : listaProductos) {
-            if (productoEncontrado.getIdProducto() == idProd) {
-                productoBuscado = productoEncontrado;
-                System.out.println("Ingrese nombre para producto: ");
-                String nombreProducto = sc.nextLine();
-                productoBuscado.setNombreProducto(nombreProducto);
-                System.out.println("Nombre agregado con exito !");
-                System.out.println("Ingrese una descripcion para el producto: ");
-                String descripcionProd = sc.nextLine();
-                productoBuscado.setDescripcionProducto(descripcionProd);
-                System.out.println("Descripcion agregada con exito !");
+        // Valido el precio
+        double precio = 0;
+        boolean precioValido = false;
+        do {
+            try {
                 System.out.println("Ingrese precio del producto: ");
-                double precio = sc.nextDouble();
-                sc.nextLine();
-                productoBuscado.setPrecioProducto(precio);
-                System.out.println("Precio agregado con exito !");
-                System.out.println("Ingrese cantidad de stock para productos");
-                int stock = sc.nextInt();
-                sc.nextLine();
-                productoBuscado.setCantidadStockProducto(stock);
-                System.out.println("Stock agregado con exito !");
-                //listaProductos.add(productoEncontrado); se pongo esta linea mi producto quedaria duplicado con el id
-                System.out.println("Producto actualizado con exito");
+                precio = sc.nextDouble();
+                if (precio < 0) {
+                    throw new IllegalArgumentException("El precio no puede ser negativo.");
+                }
+                producto.setPrecioProducto(precio);
+                precioValido = true;
+                System.out.println("Precio agregado con éxito!");
+            } catch (InputMismatchException e) {
+                System.out.println("Error: Ingrese un número válido para el precio.");
+                sc.next(); // Limpiar el buffer del Scanner
+            } catch (IllegalArgumentException e) {
+                System.out.println(e.getMessage());
             }
-        }
+        } while (!precioValido);
 
+        // Valido el stock
+        int stock = 0;
+        boolean stockValido = false;
+        do {
+            try {
+                System.out.println("Ingrese cantidad de stock para productos: ");
+                stock = sc.nextInt();
+                if (stock < 0) {
+                    throw new IllegalArgumentException("La cantidad de stock no puede ser negativa.");
+                }
+                producto.setCantidadStockProducto(stock);
+                stockValido = true;
+                System.out.println("Stock agregado con éxito!");
+            } catch (InputMismatchException e) {
+                System.out.println("Error: Ingrese un número entero válido para el stock.");
+                sc.next(); // Limpiar el buffer del Scanner
+            } catch (IllegalArgumentException e) {
+                System.out.println(e.getMessage());
+            }
+        } while (!stockValido);
+
+        listaProductos.add(producto);
+        if (!listaProductos.isEmpty()) {
+            System.out.println("Producto agregado con éxito al inventario.");
+        }
     }
+
+   public void actualizarProducto(int idProd) {
+    Scanner sc = new Scanner(System.in);
+    Producto productoBuscado;
+    for (Producto productoEncontrado : listaProductos) {
+        if (productoEncontrado.getIdProducto() == idProd) {
+            productoBuscado = productoEncontrado;
+            System.out.println("Ingrese nombre para producto: ");
+            String nombreProducto = sc.nextLine();
+            productoBuscado.setNombreProducto(nombreProducto);
+            System.out.println("Nombre actualizado con éxito!");
+
+            System.out.println("Ingrese una descripción para el producto: ");
+            String descripcionProd = sc.nextLine();
+            productoBuscado.setDescripcionProducto(descripcionProd);
+            System.out.println("Descripción actualizada con éxito!");
+
+            // Validar precio
+            double precio = 0;
+            boolean precioValido = false;
+            do {
+                try {
+                    System.out.println("Ingrese precio del producto: ");
+                    precio = sc.nextDouble();
+                    if (precio < 0) {
+                        throw new IllegalArgumentException("El precio no puede ser negativo.");
+                    }
+                    productoBuscado.setPrecioProducto(precio);
+                    precioValido = true;
+                    System.out.println("Precio actualizado con éxito!");
+                } catch (InputMismatchException e) {
+                    System.out.println("Error: Ingrese un número válido para el precio.");
+                    sc.next(); // Limpiar el buffer del Scanner
+                } catch (IllegalArgumentException e) {
+                    System.out.println(e.getMessage());
+                }
+            } while (!precioValido);
+
+            // Validar stock
+            int stock = 0;
+            boolean stockValido = false;
+            do {
+                try {
+                    System.out.println("Ingrese cantidad de stock para productos: ");
+                    stock = sc.nextInt();
+                    if (stock < 0) {
+                        throw new IllegalArgumentException("La cantidad de stock no puede ser negativa.");
+                    }
+                    productoBuscado.setCantidadStockProducto(stock);
+                    stockValido = true;
+                    System.out.println("Stock actualizado con éxito!");
+                } catch (InputMismatchException e) {
+                    System.out.println("Error: Ingrese un número entero válido para el stock.");
+                    sc.next(); // Limpiar el buffer del Scanner
+                } catch (IllegalArgumentException e) {
+                    System.out.println(e.getMessage());
+                }
+            } while (!stockValido);
+
+            System.out.println("Producto actualizado con éxito.");
+        }
+    }
+}
 
     //Elimina un producto por el id
     public void eliminarProductoPorId(int idProd) {
@@ -153,11 +222,11 @@ public class Inventario {
             if (productoEncontrado.getDescripcionProducto().contains(descripcion)) {
                 productoBuscado = productoEncontrado;
                 System.out.println(productoBuscado);
-            }else{
-            productoBuscado = null;
+            } else {
+                productoBuscado = null;
             }
         }
-        if(productoBuscado == null){
+        if (productoBuscado == null) {
             System.out.println("Lo sentimos, no hay productos con esa descripcion");
         }
     }
